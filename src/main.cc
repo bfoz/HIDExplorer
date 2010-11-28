@@ -5,25 +5,39 @@
 */
 
 #include <QApplication>
+#include <QHBoxLayout>
 #include <QListWidget>
 
 #include <hid.h>
 
+#include "delegate.h"
+#include "HIDDetailWidget.h"
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    Delegate* delegate = new Delegate;
 
-    HID::device_list devices = HID::find();
+    delegate->devices = HID::find();
 
-    QListWidget* listWidget = new QListWidget;
-    HID::device_list::iterator i = devices.begin();
-    for(; i != devices.end(); ++i)
+    delegate->listWidget = new QListWidget;
+    HID::device_list::iterator i = delegate->devices.begin();
+    for(; i != delegate->devices.end(); ++i)
     {
 	QListWidgetItem* newItem = new QListWidgetItem((*i)->product().c_str());
-	listWidget->addItem(newItem);
-
-	listWidget->show();
+	delegate->listWidget->addItem(newItem);
     }
+    QObject::connect(delegate->listWidget, SIGNAL(clicked(const QModelIndex&)), delegate, SLOT(clicked(const QModelIndex&)));
+
+    delegate->detailWidget = new HID::DetailWidget;
+
+    QHBoxLayout* hbox = new QHBoxLayout();
+    hbox->addWidget(delegate->listWidget);
+    hbox->addWidget(delegate->detailWidget);
+
+    QWidget* widget = new QWidget;
+    widget->setLayout(hbox);
+    widget->show();
 
     return app.exec();
 }
