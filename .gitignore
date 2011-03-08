@@ -1,6 +1,9 @@
 build/
 Makefile
 
+# Qt stuff
+moc_*
+
 # xcode stuff
 *.app
 *.xcodeproj/
