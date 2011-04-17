@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QListWidget>
+#include <QTabWidget>
 
 #include <hid.h>
 
@@ -31,9 +32,12 @@ int main(int argc, char *argv[])
 
     delegate->detailWidget = new HID::DetailWidget;
 
+    QTabWidget* tabs = new QTabWidget;
+    tabs->addTab(delegate->detailWidget, "Info");
+
     QHBoxLayout* hbox = new QHBoxLayout();
     hbox->addWidget(delegate->listWidget);
-    hbox->addWidget(delegate->detailWidget);
+    hbox->addWidget(tabs);
 
     QWidget* widget = new QWidget;
     widget->setLayout(hbox);
