@@ -12,6 +12,7 @@
 #include <hid.h>
 
 #include "delegate.h"
+#include "ElementsWidget.h"
 #include "HIDDetailWidget.h"
 
 int main(int argc, char *argv[])
@@ -31,9 +32,11 @@ int main(int argc, char *argv[])
     QObject::connect(delegate->listWidget, SIGNAL(clicked(const QModelIndex&)), delegate, SLOT(clicked(const QModelIndex&)));
 
     delegate->detailWidget = new HID::DetailWidget;
+    delegate->elementsWidget = new HID::ElementsWidget;
 
     QTabWidget* tabs = new QTabWidget;
     tabs->addTab(delegate->detailWidget, "Info");
+    tabs->addTab(delegate->elementsWidget, "Elements");
 
     QHBoxLayout* hbox = new QHBoxLayout();
     hbox->addWidget(delegate->listWidget);

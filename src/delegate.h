@@ -3,10 +3,16 @@
 
 #include <QObject>
 
-#include "HIDDetailWidget.h"
+#include <hid.h>
 
 class QListWidget;
 class QModelIndex;
+
+namespace HID
+{
+    class DetailWidget;
+    class ElementsWidget;
+}
 
 class Delegate : public QObject
 {
@@ -14,6 +20,7 @@ class Delegate : public QObject
 
 public:
     HID::DetailWidget*	detailWidget;
+    HID::ElementsWidget*    elementsWidget;
     HID::device_list	devices;
     QListWidget*    listWidget;
 
