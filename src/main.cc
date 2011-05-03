@@ -15,20 +15,29 @@
 #include "ElementsWidget.h"
 #include "HIDDetailWidget.h"
 
+void matched(HID::enumerator_type* enumerator, HID::device_type* device, void* context)
+{
+    Delegate *const delegate = (Delegate*)context;
+    QListWidgetItem* newItem = new QListWidgetItem(device->product().c_str());
+    delegate->listWidget->addItem(newItem);
+}
+
+void removed(HID::enumerator_type* enumerator, HID::device_type* device, void* context)
+{
+    Delegate *const delegate = (Delegate*)context;
+    QList<QListWidgetItem*> items = delegate->listWidget->findItems(device->product().c_str(), Qt::MatchFixedString);
+
+    QList<QListWidgetItem*>::iterator i = items.begin();
+    for(; i != items.end(); ++i)
+	delegate->listWidget->takeItem(delegate->listWidget->row(*i));
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     Delegate* delegate = new Delegate;
 
-    delegate->devices = HID::find();
-
     delegate->listWidget = new QListWidget;
-    HID::device_list::iterator i = delegate->devices.begin();
-    for(; i != delegate->devices.end(); ++i)
-    {
-	QListWidgetItem* newItem = new QListWidgetItem((*i)->product().c_str());
-	delegate->listWidget->addItem(newItem);
-    }
     QObject::connect(delegate->listWidget, SIGNAL(clicked(const QModelIndex&)), delegate, SLOT(clicked(const QModelIndex&)));
 
     delegate->detailWidget = new HID::DetailWidget;
@@ -53,6 +62,12 @@ int main(int argc, char *argv[])
     QWidget* widget = new QWidget;
     widget->setLayout(hbox);
     widget->show();
+
+    // Create a USB HID enumerator to watch for device events and dispatch them accordingly
+    HID::enumerator_type* enumerator = HID::enumerator();
+    enumerator->setMatchCallback(matched, delegate);
+    enumerator->setRemovalCallback(removed, delegate);
+    enumerator->start();
 
     return app.exec();
 }
