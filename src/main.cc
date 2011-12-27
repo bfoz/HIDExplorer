@@ -15,23 +15,6 @@
 #include "ElementsWidget.h"
 #include "HIDDetailWidget.h"
 
-void matched(HID::enumerator_type* enumerator, HID::device_type* device, void* context)
-{
-    Delegate *const delegate = (Delegate*)context;
-    QListWidgetItem* newItem = new QListWidgetItem(device->product().c_str());
-    delegate->listWidget->addItem(newItem);
-}
-
-void removed(HID::enumerator_type* enumerator, HID::device_type* device, void* context)
-{
-    Delegate *const delegate = (Delegate*)context;
-    QList<QListWidgetItem*> items = delegate->listWidget->findItems(device->product().c_str(), Qt::MatchFixedString);
-
-    QList<QListWidgetItem*>::iterator i = items.begin();
-    for(; i != items.end(); ++i)
-	delegate->listWidget->takeItem(delegate->listWidget->row(*i));
-}
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -63,11 +46,7 @@ int main(int argc, char *argv[])
     widget->setLayout(hbox);
     widget->show();
 
-    // Create a USB HID enumerator to watch for device events and dispatch them accordingly
-    HID::enumerator_type* enumerator = HID::enumerator();
-    enumerator->setMatchCallback(matched, delegate);
-    enumerator->setRemovalCallback(removed, delegate);
-    enumerator->start();
+    delegate->start();
 
     return app.exec();
 }

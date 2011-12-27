@@ -24,8 +24,14 @@ public:
     HID::device_list	devices;
     QListWidget*    listWidget;
 
+    Delegate();
+    void start() { enumerator->start(); }
+
 public slots:
     void clicked(const QModelIndex& index);
+
+private:
+    HID::enumerator_type*   enumerator;
 };
 
 #endif	// _DELEGATE_H
